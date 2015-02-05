@@ -17,6 +17,9 @@ using System.IO;
 using System.Net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using MySql.Data.MySqlClient;
+
+using System.Threading;
 
 namespace WpfApplication1
 {
@@ -28,77 +31,87 @@ namespace WpfApplication1
         public MainWindow()
         {
             InitializeComponent();
-            string result = "";
-            int px = 8472;
-            int py = 12354;
-            int len = 3;
-            for (int i = px - len; i < px + len; i++)
+
+
+            new Thread(new ThreadStart(() =>
             {
-                for (int j = py - len; j < py + len; j++)
+                MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection("Server=14.63.175.76;Database=valet2;Uid=root;Pwd=valet2;");
+                connection.Open();
+
+                string result = "";
+                int px = 8472;
+                int py = 12354;
+                int len = 50;
+
+                for (int i = px - len; i < px + len; i++)
                 {
-                    string link = @"https://www.crimereports.com/v3/crime_reports/map/search_by_tile.json?start_date=2014/01/04&end_date=2015/02/04&incident_type_ids=100,104,98,103,99,101,170,8,97,148,9,149,150&row=" + j.ToString() + @"&column=" + i.ToString() + @"&zoom=15&include_sex_offenders=true&_=1423084677870";
-
-                    HttpWebRequest oRequest = (HttpWebRequest)WebRequest.Create(link);
-                    HttpWebResponse oGetResponse = (HttpWebResponse)oRequest.GetResponse();
-                    StreamReader oStreamReader = new StreamReader(oGetResponse.GetResponseStream());
-
-                    string now = oStreamReader.ReadToEnd();
-                    if (now == "{\"crimes\":[],\"offenders\":[]}")
+                    for (int j = py - len; j < py + len; j++)
                     {
-                        System.Diagnostics.Debug.Print(i.ToString() + " / " + j.ToString());
-                    }
-                    else
-                    {
-                        if (result != "")
-                            result += "\r\n," + now;
+                        string link = @"https://www.crimereports.com/v3/crime_reports/map/search_by_tile.json?start_date=2014/01/01&end_date=2015/02/04&incident_type_ids=100,104,98,103,99,101,170,8,97,148,9,149,150&row=" + j.ToString() + @"&column=" + i.ToString() + @"&zoom=15&include_sex_offenders=true&_=1423084677870";
+
+                        HttpWebRequest oRequest = (HttpWebRequest)WebRequest.Create(link);
+                        HttpWebResponse oGetResponse = (HttpWebResponse)oRequest.GetResponse();
+                        StreamReader oStreamReader = new StreamReader(oGetResponse.GetResponseStream());
+
+                        string now = oStreamReader.ReadToEnd();
+                        if (now == "{\"crimes\":[],\"offenders\":[]}" || now == "")
+                        {
+                            System.Diagnostics.Debug.Print(i.ToString() + " / " + j.ToString());
+                        }
                         else
-                            result += now;
+                        {
+                            if (result != "")
+                                result += "\r\n," + now;
+                            else
+                                result += now;
+                        }
+                    }
+                }
+                dynamic jsonData = JsonConvert.DeserializeObject("{ \"datas\" : [" + result + "] }");
+                foreach (dynamic data in jsonData["datas"])
+                {
+                    foreach (dynamic crime in data["crimes"])
+                    {
+                        string identifi = MySqlHelper.EscapeString(crime["ccn"].ToString());
+                        double lat = crime["lat"];
+                        double lng = crime["lng"];
+                        int type = crime["incident_type_id"];
+                        int policeId = crime["org_id"];
+                        string policeName = MySqlHelper.EscapeString(crime["org_name"].ToString());
+                        string address = MySqlHelper.EscapeString(crime["address"].ToString());
+                        string date = crime["incident_date_time"].ToString("yyyy-MM-dd HH:mm:ss");
+                    
+                        string description = MySqlHelper.EscapeString(crime["description"].ToString());
+
+                        string sqlvalue = string.Format(@"'{0}', {1}, {2}, {3}, {4}, '{5}', '{6}', '{7}', '{8}'", identifi, lat, lng, type, policeId, policeName, address, date, description);
+                        MySqlHelper.ExecuteNonQuery(connection, "INSERT INTO crimes (`identifier`, `latitude`, `longitude`, `type`, `police_id`, `police_name`, `address`, `date`, `description` ) VALUES (" + sqlvalue + ");");
+                    }
+                    foreach (dynamic offender in data["offenders"])
+                    {
+                        string id = offender["id"];
+                        double lat = offender["lat"];
+                        double lng = offender["lng"];
+                        string address = MySqlHelper.EscapeString(offender["address"].ToString());
+                        string city = MySqlHelper.EscapeString(offender["city"].ToString());
+                        string state = MySqlHelper.EscapeString(offender["state"].ToString());
+                        string zip = MySqlHelper.EscapeString(offender["zip"].ToString());
+                        string name = MySqlHelper.EscapeString(offender["name"].ToString());
+                        string photoUrl = MySqlHelper.EscapeString(offender["photoUrl"].ToString());
+                        string height = MySqlHelper.EscapeString(offender["height"].ToString());
+                        string weight = MySqlHelper.EscapeString(offender["weight"].ToString());
+                        string eyeColor = MySqlHelper.EscapeString(offender["eyeColor"].ToString());
+                        string hairColor = MySqlHelper.EscapeString(offender["hairColor"].ToString());
+                        int age = offender["age"];
+                        string race = MySqlHelper.EscapeString(offender["race"].ToString());
+                        string sex = MySqlHelper.EscapeString(offender["sex"].ToString());
+
+                        string sqlvalue = string.Format("\"{0}\", {1}, {2}, \"{3}\", \"{4}\", \"{5}\", \"{6}\", \"{7}\", \"{8}\", \"{9}\", \"{10}\", \"{11}\", \"{12}\", {13}, \"{14}\", \"{15}\"", id, lat, lng, address, city, state, zip, name, photoUrl, height, weight, eyeColor, hairColor, age, race, sex);
+                        MySqlHelper.ExecuteNonQuery(connection, "INSERT INTO sex_offenders (`identifier`, `latitude`, `longitude`, `address`, `city`, `state`, `zip`, `name`, `photourl`, `height`, `weight`, `eyecolor`, `haircolor`, `age`, `race`, `sex` ) VALUE (" + sqlvalue + ");");
                     }
 
-
-
-
-
-
-
                 }
-            }
-            dynamic jsonData = JsonConvert.DeserializeObject("{ \"datas\" : [" + result + "] }");
-            foreach (dynamic data in jsonData["datas"])
-            {
-                foreach (dynamic crime in data["crimes"])
-                {
-                    string identifi = crime["ccn"];
-                    string date = crime["incident_date_time"];
-                    int policeId = crime["org_id"];
-                    string policeName = crime["org_name"];
-                    int type = crime["incident_type_id"];
-                    string address = crime["address"];
-                    string description = crime["description"];
-                    double lng = crime["lng"];
-                    double lat = crime["lat"];
-                }
-                foreach (dynamic offender in data["offenders"])
-                {
-                    string address = offender["address"];
-                    string city = offender["city"];
-                    string state = offender["state"];
-                    string zip = offender["zip"];
-                    string name = offender["name"];
-                    string photoUrl = offender["photoUrl"];
-                    double lng = offender["lng"];
-                    double lat = offender["lat"];
-                    string race = offender["race"];
-                    string sex = offender["sex"];
-                    string height = offender["height"];
-                    string weight = offender["weight"];
-                    string eyeColor = offender["eyeColor"];
-                    string hairColor = offender["hairColor"];
-                    int age = offender["age"];
-                }
+            })).Start();
 
-
-            }
 
         }
     }

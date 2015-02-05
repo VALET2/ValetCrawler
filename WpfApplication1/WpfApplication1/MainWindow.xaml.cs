@@ -81,24 +81,20 @@ namespace WpfApplication1
                 foreach (dynamic offender in data["offenders"])
                 {
                     string address = offender["address"];
-
-                    /*
-                               "address": "2200 STATE ROAD 26 W",
-          "city": "WEST LAFAYETTE",
-          "state": "IN",
-          "zip": "47906",
-          "name": "JAYCE ADAM KEARNS",
-          "photoUrl": "http://photo.familywatchdog.us/OffenderPhoto/OffenderPhoto.aspx?id=IN1138385",
-          "lng": -86.9305318,
-          "lat": 40.4242758,
-          "race": "White",
-          "sex": "M",
-          "height": "6'00'",
-          "weight": "160lbs",
-          "eyeColor": "Blue",
-          "hairColor": "Brown",
-          "age": 28,
-                     */
+                    string city = offender["city"];
+                    string state = offender["state"];
+                    string zip = offender["zip"];
+                    string name = offender["name"];
+                    string photoUrl = offender["photoUrl"];
+                    double lng = offender["lng"];
+                    double lat = offender["lat"];
+                    string race = offender["race"];
+                    string sex = offender["sex"];
+                    string height = offender["height"];
+                    string weight = offender["weight"];
+                    string eyeColor = offender["eyeColor"];
+                    string hairColor = offender["hairColor"];
+                    int age = offender["age"];
                 }
 
 

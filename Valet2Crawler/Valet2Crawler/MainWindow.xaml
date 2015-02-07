@@ -1,0 +1,68 @@
+﻿<Window x:Class="Valet2Crawler.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:Valet2Crawler"
+        Title="VALET2 Crawler" Height="350" MaxHeight="350" MinHeight="350" Width="450" MaxWidth="450" MinWidth="450" WindowStyle="ToolWindow" Closing="Window_Closing">
+    <Grid>
+        <Grid Height="50" VerticalAlignment="Top" Background="Gray">
+            <TextBlock Margin="10,10,10,13" TextWrapping="Wrap" FontSize="20" Foreground="White"><Run Text="VALET2 Crawle"/><Run Text="r"/></TextBlock>
+        </Grid>
+        <GroupBox Header="Date" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,55,0,0" Height="85" Width="160">
+            <Grid>
+                <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Start" VerticalAlignment="Top"/>
+                <TextBlock HorizontalAlignment="Left" Margin="10,39,0,0" TextWrapping="Wrap" Text="End" VerticalAlignment="Top"/>
+
+                <DatePicker Name="StartDate_DP" HorizontalAlignment="Left" Margin="40,6,0,0" VerticalAlignment="Top" Width="100" SelectedDate="2014/01/01"/>
+                <DatePicker Name="EndDate_DP" HorizontalAlignment="Left" Margin="40,35,0,0" VerticalAlignment="Top" Width="100" SelectedDate="2015/02/04"/>
+            </Grid>
+        </GroupBox>
+        <ProgressBar Name="pgbar" Margin="10,0,10,95" Height="10" VerticalAlignment="Bottom"/>
+        <GroupBox Header="Status" Margin="10,0,10,10" Height="80" VerticalAlignment="Bottom">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="128*"/>
+                    <ColumnDefinition Width="139*"/>
+                    <ColumnDefinition Width="143*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="Time : " Height="16" Width="37"/>
+                <TextBlock x:Name="view_timeTB" HorizontalAlignment="Left" Margin="47,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="61" Height="16"><Run Text="00:00"/><Run Text=":00"/></TextBlock>
+                <TextBlock Margin="10,31,0,0" TextAlignment="Right" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Column="1" Height="16" HorizontalAlignment="Left" Width="30"><Run Text="col "/><Run Text=": "/></TextBlock>
+                <TextBlock Margin="8,10,0,0" TextAlignment="Right" TextWrapping="Wrap" VerticalAlignment="Top" Grid.Column="1" Height="16" HorizontalAlignment="Left" Width="30"><Run Text="row :"/><Run Text=" "/></TextBlock>
+                <TextBlock Margin="10,32,0,0" TextAlignment="Right" TextWrapping="Wrap" VerticalAlignment="Top" Width="33" HorizontalAlignment="Left" Height="16" Text="Per :"/>
+                <Rectangle HorizontalAlignment="Left" Stroke="Gray" Width="1" Grid.Column="1"/>
+                <TextBlock Name="view_rowTB" HorizontalAlignment="Left" Margin="38,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="91" Height="16" Grid.Column="1"><Run Text="00000/00"/><Run Text="0"/><Run Text="00"/></TextBlock>
+                <TextBlock Name="view_colTB" HorizontalAlignment="Left" Margin="38,31,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Text="00000/00000" Width="91" Height="16" Grid.Column="1"/>
+                <TextBlock x:Name="view_perTB" HorizontalAlignment="Left" Margin="48,32,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="60" Height="16"><Run Text="0.00"/><Run Text="%"/></TextBlock>
+                <TextBlock TextAlignment="Right" Margin="0,42,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="16" Grid.Column="2" HorizontalAlignment="Right" Width="128"><Run Text="SW Maestro"/><Run Text=" 5th"/></TextBlock>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="GoogleMap Tile" HorizontalAlignment="Left" Margin="175,55,0,0" Width="170" Height="143" VerticalAlignment="Top">
+            <Grid>
+                <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Row" VerticalAlignment="Top"/>
+                <TextBlock HorizontalAlignment="Left" Margin="10,39,0,0" TextWrapping="Wrap" Text="Col" VerticalAlignment="Top"/>
+                <TextBlock HorizontalAlignment="Left" Margin="93,10,0,0" TextWrapping="Wrap" Text="~" VerticalAlignment="Top"/>
+                <TextBlock HorizontalAlignment="Left" Margin="93,39,0,0" TextWrapping="Wrap" Text="~" VerticalAlignment="Top"/>
+
+                <TextBox Name="StartCol_TB" HorizontalAlignment="Left" Height="23" Margin="38,6,0,0" TextWrapping="Wrap" Text="00000" VerticalAlignment="Top" Width="50" MaxLength="5" KeyDown="NumberOnly_KeyDown"/>
+                <TextBox Name="EndCol_TB" HorizontalAlignment="Left" Height="23" Margin="106,6,0,0" TextWrapping="Wrap" Text="00000" VerticalAlignment="Top" Width="50" MaxLength="5" KeyDown="NumberOnly_KeyDown"/>
+                <TextBox Name="StartRow_TB" HorizontalAlignment="Left" Height="23" Margin="38,35,0,0" TextWrapping="Wrap" Text="00000" VerticalAlignment="Top" Width="50" MaxLength="5" KeyDown="NumberOnly_KeyDown"/>
+                <TextBox Name="EndRow_TB" HorizontalAlignment="Left" Height="23" Margin="106,35,0,0" TextWrapping="Wrap" Text="00000" VerticalAlignment="Top" Width="50" MaxLength="5" KeyDown="NumberOnly_KeyDown"/>
+                <TextBlock HorizontalAlignment="Left" Margin="10,68,0,0" TextWrapping="Wrap" Text="Zoom lv" VerticalAlignment="Top"/>
+                <TextBox x:Name="ZoomLv_TB" HorizontalAlignment="Left" Height="23" Margin="60,65,0,0" TextWrapping="Wrap" Text="15" VerticalAlignment="Top" Width="96" MaxLength="5" KeyDown="NumberOnly_KeyDown"/>
+                <TextBlock TextWrapping="Wrap" Margin="0,99,0,0" HorizontalAlignment="Center">
+                    <Hyperlink Click="OpenReferWeb">
+                        <Run Text="*Open refer web*"/>
+                    </Hyperlink>
+                </TextBlock>
+            </Grid>
+        </GroupBox>
+        <Button Name="RunButton" Content="Crawling" VerticalAlignment="Top" Margin="350,65,10,0" Height="133" Click="CrawlingStart"/>
+        <GroupBox Header="SQL Insert" HorizontalAlignment="Left" Margin="10,0,0,121" Width="160" Height="54" VerticalAlignment="Bottom">
+            <Grid>
+                <CheckBox Name="SI_Crime_CB" Content="Crime" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" IsChecked="True"/>
+                <CheckBox Name="SI_Offender_CB" Content="Offender" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="70,10,0,0" IsChecked="True"/>
+            </Grid>
+        </GroupBox>
+
+    </Grid>
+</Window>
